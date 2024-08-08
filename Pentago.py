@@ -1,6 +1,6 @@
 # Author: Kevin Klein
 # GitHub username: kevmklein
-# Date: 2024.8.7
+# Date: 2024.8.8
 # Project: OSU cs162 portfolio project
 # Description: Includes Pentago class.
 #   * Maintains a representation of the board, number of pieces placed, and
@@ -27,11 +27,10 @@ DETAILED TEXT DESCRIPTIONS OF HOW TO HANDLE THE SCENARIOS
 3. Keeping track of the current board position
     (I interpret this to mean keeping track of the board re: the pieces on it.)
     _board keeps track of the whole board. It is a 6x6 2-D list containing
-    all the pieces of the board.
-
-    The board is updated during make_move by calling set_piece with the
-    color and position arguments to make_move, and if there is no winner it is
-    updated again by calling rotate with the sub_board and rotation arguments.
+    all the pieces of the board. The board is updated during make_move by
+    calling set_piece with the color and position arguments to make_move,
+    and if there is no winner it is updated again by calling rotate with
+    the sub_board and rotation arguments.
 
 4. Determining if a regular move is valid
     We need to check four things:
@@ -62,7 +61,8 @@ DETAILED TEXT DESCRIPTIONS OF HOW TO HANDLE THE SCENARIOS
     set_piece with the color and position arguments to make_move. After
     checking for a winner, if there is none then the positions of the given
     sub_board are updated by calling rotate with the give sub_board and
-    rotation arguments.
+    rotation arguments. rotate updates the eight pieces of the sub_board
+    that need to be updated.
 
 7. Determining whether there is any 5-in-row on the board for one color of the
 piece
@@ -71,17 +71,19 @@ piece
 
     * after placing a piece, get the lines (lists of positions) going through
     the given position via get_row_line, get_col_line, and get_diag_lines.
-    Call contains_5_in_a_row on the lists to check for five consecutive
-    pieces of either color.
+    Call contains_5_in_a_row on each of the the lists, which iterates
+    through the positions getting their pieces and checking for
+    five consecutive pieces of either color.
     * after rotating, do the same thing on all the row and column lines
     of the rotated sub_board, as well as the diagonals going through the inner
-    corner and the diagonals adjacent to those.
+    corner and the diagonals adjacent to those, 6 diagonals are passed to
+    contains_5_in_a_row, though only 4 might return a winner.
 
 8. Determining whether the current board is full
     Compare the value of _pieces_placed to 36.
 
 9. Determining the current state of the game
-    Call contains_5_in_a_row on the appropriate lines, as above, and look
+    Call contains_5_in_a_row on the appropriate lines, as above, and iterate
     through the results. If red and black both have 5-in-a-row at the same
     time, it's a draw. If only one color has 5-in-a-row, they win. If there
     is no color with 5-in-a-row, check for a draw by calling is_board_full.
