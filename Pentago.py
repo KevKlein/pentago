@@ -3,9 +3,9 @@
 # Date: 2024.8.13
 # Project: OSU cs162 portfolio project
 # Description: Includes Pentago class.
-#   * Maintains a representation of the board, number of pieces placed, and
-#       game state, and has some access methods including get_game_state,
-#       is_board_full, and whose_turn.
+#   * Maintains a representation of the board, number of pieces placed,
+#       game state, and current player, and has some access methods including
+#       get_game_state and is_board_full.
 #   * Handles making a move with make_move, with helper functions to
 #       place a piece, rotate a quadrant, check for 5-in-a-row, and do some
 #       input validity checking.
@@ -49,8 +49,8 @@ class Pentago:
     row of five after the rotation, the game ends in a draw.
 
     * Handles all the logic for the game. Initializes and keeps track of the
-    board and the game state, including if a player has won, and how many pieces
-    have been placed.
+    board and the game state, including if a player has won, how many pieces
+    have been placed, and whose turn it is.
     * Handles making a player's move, including updating the board
     to reflect the placed piece and sub_board rotation, and re-evaluating the
     game state. Also handles some input validation.
@@ -62,6 +62,7 @@ class Pentago:
         self._board = [[EMPTY] * 6 for _ in range(6)]  # 2-D list, [y][x]
         self._pieces_placed = 0
         self._game_state = 'UNFINISHED'
+        self._current_player = 'black'
 
     def get_game_state(self):
         """Returns the state of the game, which is evaluated after each move.
@@ -101,6 +102,8 @@ class Pentago:
         # place piece
         self.set_piece(position, color)
         self._pieces_placed += 1
+        self._current_player = ('black' if self._pieces_placed % 2 == 0
+                                else 'white')
 
         # Re-evaluate game state by checking for win at position
         #   Get the lines passing through the given position
@@ -170,7 +173,7 @@ class Pentago:
 
         if self._game_state != 'UNFINISHED':
             return "game is finished"
-        if self.whose_turn() != color:
+        if color != self._current_player:
             return "not this player's turn"
         if not (0 <= x <= 5 and 0 <= y <= 5):
             return "position out of bounds"
@@ -182,13 +185,6 @@ class Pentago:
             return "rotation direction invalid"
         else:
             return 'valid'
-
-    def whose_turn(self):
-        """Returns whose turn it is. Black goes first."""
-        if self._pieces_placed % 2 == 0:
-            return 'black'
-        else:
-            return 'white'
 
     def piece_at(self, position):
         """Takes a position, either in alphanumeric form (b3) or in
