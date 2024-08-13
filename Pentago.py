@@ -1,13 +1,13 @@
 # Author: Kevin Klein
 # GitHub username: kevmklein
-# Date: 2024.8.8
+# Date: 2024.8.13
 # Project: OSU cs162 portfolio project
 # Description: Includes Pentago class.
 #   * Maintains a representation of the board, number of pieces placed, and
 #       game state, and has some access methods including get_game_state,
 #       is_board_full, and whose_turn.
-#   * Handles making a move with make_move, with various helper functions to
-#       place a piece, rotate a quadrant, evaluate the game state, and do some
+#   * Handles making a move with make_move, with helper functions to
+#       place a piece, rotate a quadrant, check for 5-in-a-row, and do some
 #       input validity checking.
 #   * Can print_board for a visual representation of the board.
 
@@ -49,15 +49,14 @@ class Pentago:
     row of five after the rotation, the game ends in a draw.
 
     * Handles all the logic for the game. Initializes and keeps track of the
-    board and the game state, including if a player has won, how many pieces
-    have been placed, and whose turn it is.
+    board and the game state, including if a player has won, and how many pieces
+    have been placed.
     * Handles making a player's move, including updating the board
     to reflect the placed piece and sub_board rotation, and re-evaluating the
     game state. Also handles some input validation.
     * Can display a visual representation of the board.
     * Has various helper methods to accomplish the above.
     """
-    sub_board_centers = {1: (1, 1), 2: (1, 4), 3: (4, 1), 4: (4, 4)}
 
     def __init__(self):
         self._board = [[EMPTY] * 6 for _ in range(6)]  # 2-D list, [y][x]
@@ -89,8 +88,8 @@ class Pentago:
         the sub_board they want to rotate (1-4), and the direction they want to
         rotate it ('C' for clockwise or 'A' for anit-clockwise).
         * Checks to see if move is valid, returning a status message if not.
-        * If valid, places the marble, evaluates the game state, rotates the
-        sub_board if there's still no winner, and evaluates the game state
+        * If valid, places the marble, updates the game state, rotates the
+        sub_board if there's still no winner, and updates the game state
         again.
         * Returns True if the move was carried out.
         """
@@ -131,19 +130,21 @@ class Pentago:
         #   plus the diagonals passing through the quadrant's inner corner
         #   plus the diagonals on either side of those diagonals
         y, x = SUB_BOARD_INNER_CORNERS.get(sub_board)
-        lines_to_check += [self.get_diag_lines(pos) for pos in [(y, x - 1),
+        diag_line_pairs = [self.get_diag_lines(pos) for pos in [(y, x - 1),
                                                                 (y, x),
                                                                 (y, x + 1)]]
+        for diag_line in diag_line_pairs:
+            lines_to_check += diag_line
         #   Check the lines for 5-in-a-row
         black_wins = False
         white_wins = False
-        for winner in [self.contains_5_in_a_row(line) for line in
+        for result in [self.contains_5_in_a_row(line) for line in
                        lines_to_check]:
-            if winner == 'black':
+            if result == 'black':
                 black_wins = True
-            if winner == 'white':
+            if result == 'white':
                 white_wins = True
-        #   Did black, white, or both get 5-in-a-row?
+        #   Did black, white, both (or neither) get 5-in-a-row?
         if black_wins and white_wins:
             self._game_state = 'DRAW'
         elif black_wins:
@@ -159,9 +160,11 @@ class Pentago:
     def is_valid_move(self, color, position, sub_board, rotation):
         """Helper for make_move. Checks if move is valid with respect to
         whether the game is already finished, turn order, and which positions
-        are already taken, and whether the position is within the bounds of
-        the board. All other aspects of the input are assumed to be
-        valid. Returns an error message if invalid, else returns 'valid'.
+        are already taken, whether the position is within the bounds of
+        the board, whether the sub_board is actually a quadrant of the
+        board, and whether the rotation direction is clockwise or
+        anti-clockwise. All other aspects of the input are assumed to be valid.
+        Returns an error message if invalid, else returns 'valid'.
         """
         x, y = self.coords(position)
 
@@ -175,6 +178,8 @@ class Pentago:
             return "position is not empty"
         if not (1 <= sub_board <= 4):
             return "sub_board out of bounds"
+        if not (rotation == 'C' or rotation == 'A'):
+            return "rotation direction invalid"
         else:
             return 'valid'
 
@@ -205,9 +210,11 @@ class Pentago:
 
     def rotate(self, sub_board, direction):
         """Takes as parameters a sub_board (1, 2, 3, or 4) and a rotation
-        direction (clockwise or anti-clockwise). Moves the pieces of the
-        given sub-board 90 degrees in the given direction.
+        direction ('C' for clockwise or 'A' for anti-clockwise). Moves the
+        pieces of the given sub_board 90 degrees around the center of the
+        sub_board in the given direction.
         """
+        # get list of positions to be rotated, in order going in a circle
         y, x = SUB_BOARD_CENTERS.get(sub_board)
         relative_positions = [(UP, LEFT), (UP, MID), (UP, RIGHT),
                               (MID, RIGHT), (DOWN, RIGHT), (DOWN, MID),
@@ -218,6 +225,8 @@ class Pentago:
         if direction == ANTI_CLOCKWISE:
             sub_board_positions.reverse()
 
+        # get list of piece colors currently at those positions and move
+        # them on the board two spaces in the given direction
         current_colors = [self.piece_at(pos) for pos in sub_board_positions]
         for i, pos in enumerate(sub_board_positions):
             new_color = current_colors[(i - 2) % len(current_colors)]
@@ -233,17 +242,17 @@ class Pentago:
 
     def get_diag_lines(self, position):
         """Takes a tuple representing a position (y, x).
-        Returns a list of the diagonal line positions that go through the given 
-        position, rightward then leftward.
+        Returns a list of two lists: the diagonal line positions that go
+        through the given position rightward, then leftward.
         """
         y, x = position
         if not (0 <= x <= 5 and 0 <= y <= 5):
             return []
 
         # rightward (e.g. (0,0) to (5,5))
-        dist_from_edge = min(y, x)
-        y -= dist_from_edge
-        x -= dist_from_edge
+        dist_from_starting_edge = min(y, x)
+        y -= dist_from_starting_edge
+        x -= dist_from_starting_edge
         rightward = []
         while y <= 5 and x <= 5:
             rightward.append((y, x))
@@ -252,9 +261,9 @@ class Pentago:
 
         # leftward (e.g. (0,5) to (5,0))
         y, x = position
-        dist_from_edge = min(y, 5 - x)
-        y -= dist_from_edge
-        x += dist_from_edge
+        dist_from_starting_edge = min(y, 5 - x)
+        y -= dist_from_starting_edge
+        x += dist_from_starting_edge
         leftward = []
         while y <= 5 and x >= 0:
             leftward.append((y, x))
@@ -265,21 +274,22 @@ class Pentago:
 
     def contains_5_in_a_row(self, position_list):
         """Takes list of positions as a parameter. Checks to see if the given 
-        row contains five-in-a-row of either color. Returns the color that got
-        5-in-a-row ('black' or 'white') or False if neither got one.
+        row contains five-in-a-row of either color. Positions are
+        assumed to actually be in a straight line. Returns the color
+        that got 5-in-a-row ('black' or 'white') or False if neither got one.
         """
         if len(position_list) < 5:
             return False
 
-        consecutive_count = 1
         previous_color = self.piece_at(position_list[0])
+        consecutive_count = 1
         for position in position_list[1:]:
             color = self.piece_at(position)
             if color == previous_color and color != EMPTY:
                 consecutive_count += 1
             else:
-                consecutive_count = 1
                 previous_color = color
+                consecutive_count = 1
             if consecutive_count == 5:
                 return color
         return False
@@ -311,7 +321,7 @@ class Pentago:
               EMPTY, " = empty")
 
     def to_print_symbol(self, marble_color):
-        """Helper for print_board. Returns a unicode symbol representation of
+        """Helper for print_board. Returns a symbol representation of
         a marble for display purpose.
         """
         if marble_color == 'white':
