@@ -11,7 +11,7 @@ Pentago is a two-player abstract strategy board game. The goal is to get five ma
 
 ## Running the Game
 
-Here's a brief example:
+A brief example:
 
 ```bash
 python3 Pentago.py
@@ -19,25 +19,15 @@ python3 Pentago.py
 p = Pentago()
 
 p.make_move('black', 'a0', 1, 'A')
-p.print_board()
-
 p.make_move('white', 'a1', 1, 'A')
-p.print_board()
-
 p.make_move('black', 'c3', 1, 'C')
-p.print_board()
-
 p.make_move('white', 'f2', 1, 'C')
-p.print_board()
-
 p.make_move('black', 'a4', 1, 'C')
-p.print_board()
-
 p.make_move('white', 'b1', 1, 'C')
 p.print_board()
 
 ```
-### Sample output:
+Output:
 ```
    0  1  2   |   3  4  5
 a  -  ●  ○   |   -  ○  -
@@ -86,8 +76,7 @@ If neither white nor black has a five-in-a-row after the rotation and the
  board is full with 36 pieces, the game ends in a draw.
 
 **Black will play first**. The figure "game_board" 
- illustrates how the board will be labeled using our notation. ![board]
-(game_board.png "game board")The four sub-boards are labeled with the 
+ illustrates how the board will be labeled using our notation. ![board](game_board.png "game board")The four sub-boards are labeled with the 
 integers 1, 2, 3, and 4, as shown in the figure. The six rows are labeled 
 from 'a' to 'f' from top to bottom, and the six columns are labeled from 
 '0' to '5' from left to right. Each space on the board can then be referred 
