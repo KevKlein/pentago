@@ -10,10 +10,47 @@ Pentago is a two-player abstract strategy board game. The goal is to get five ma
 3. Win by aligning five marbles of your color in a row.
 
 ## Running the Game
-bash
+
+Here's a brief example:
+
+```bash
+python3 Pentago.py
+
+p = Pentago()
+
+p.make_move('black', 'a0', 1, 'A')
+p.print_board()
+
+p.make_move('white', 'a1', 1, 'A')
+p.print_board()
+
+p.make_move('black', 'c3', 1, 'C')
+p.print_board()
+
+p.make_move('white', 'f2', 1, 'C')
+p.print_board()
+
+p.make_move('black', 'a4', 1, 'C')
+p.print_board()
+
+p.make_move('white', 'b1', 1, 'C')
+p.print_board()
+
 ```
-python3 pentago.py
+### Sample output:
 ```
+   0  1  2   |   3  4  5
+a  -  ●  ○   |   -  ○  -
+b  -  ●  -   |   -  -  -
+c  ○  -  -   |   ○  -  -
+   ————————  |  ————————
+d  -  -  -   |   -  -  -
+e  -  -  -   |   -  -  -
+f  -  -  ●   |   -  -  -
+
+  ●  = white    ○  = black   -  = empty
+```
+
 
 ### Full Instructions
 Pentago is a two-player abstract strategy game played on a 6×6 board, which 
@@ -48,78 +85,10 @@ If the white player does not achieve five-in-a-row, after the rotation:
 If neither white nor black has a five-in-a-row after the rotation and the 
  board is full with 36 pieces, the game ends in a draw.
 
-Here, we assume that **black will play first**. The figure "game_board" 
+**Black will play first**. The figure "game_board" 
  illustrates how the board will be labeled using our notation. ![board]
 (game_board.png "game board")The four sub-boards are labeled with the 
 integers 1, 2, 3, and 4, as shown in the figure. The six rows are labeled 
 from 'a' to 'f' from top to bottom, and the six columns are labeled from 
 '0' to '5' from left to right. Each space on the board can then be referred 
 to as 'a0', 'a1', and so on.
-
-
- **Pentago** class includes the following:
-
-1.	An **init** method that initializes any data members
-2.	A method called **get_game_state** that just returns **'UNFINISHED', 
-      'WHITE_WON', 'BLACK_WON' or 'DRAW'**.
-3.	A method called **is_board_full** that takes no parameter and return 
-      True or False that indicate whether the board is already full (True if full).
-4.	A method called **make_move** that takes four parameters: 
-* **Color**: a string that represent the color of the marble. It will be 
-  either ‘white’ or ‘black’ 
-* **Position**: a string that represent the position the marble will be put 
-  onto the board. It will be like ‘a0’, ’b1’, etc.
-* **Sub-board**: an integer of either 1, 2, 3 or 4 that represents the 
-  sub-board the player choose to rotate
-* **Rotation**: a string that represent the direction the sub-board will 
-  rotate, either ‘C’ (clockwise) or ‘A’ (anti-clockwise).
-  
-For example, make_move('white', 'a2', 1, 'C'). All user 
-inputs will be assumed to be valid when the make_move method is called. 
-The method verifies the following special cases:
-* If the game is finished at this stage, the method does nothing else 
-  and returns **"game is finished"**
-* If the color of the piece to be placed doesn't match the current player's 
-  color, the method does nothing but return **"not this player's turn"**
-* If the position where the piece is to be placed is already taken, the 
-  method returns **"position is not empty"**
-  
-Otherwise, it **places** the marble onto the board, **rotate** the 
-sub-board (if the player hasn't won after placing the marble), **updates** 
-the board and game state (from unfinished to indicate who wins, if 
-necessary), **updates** whose turn it is, and **returns True**. 
-
-
-* Implements a method called **print_board** that outputs the 
-   current state of the board.
-
-A simple example of how the class could be used:
-
-```
-game = Pentago()
-print(game.make_move('black', 'a2', 1, 'C'))
-print(game.make_move('white', 'a2', 1, 'C'))
-print(game.is_board_full())
-game.print_board()
-print(game.get_game_state())
-
-```
-And the output could look like this:
-
-True
-
-True
-
-False
-
-□   □   □   □   □   □
-
-□   □   □   □   □   □
-
-●   □   ○   □   □   □
-
-□   □   □   □   □   □
-
-□   □   □   □   □   □
-
-□   □   □   □   □   □
