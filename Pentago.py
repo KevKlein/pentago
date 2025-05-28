@@ -1,8 +1,8 @@
 # Author: Kevin Klein
-# GitHub username: kevmklein
+# GitHub username: kevklein
 # Date: 2024.8.13
-# Project: OSU cs162 portfolio project
-# Description: Includes Pentago class.
+# Project: Pentago
+# Description:
 #   * Maintains a representation of the board, number of pieces placed,
 #       game state, and current player, and has some access methods including
 #       get_game_state and is_board_full.
@@ -31,23 +31,7 @@ SUB_BOARD_INNER_CORNERS = {1: (2, 2), 2: (2, 3), 3: (3, 2), 4: (3, 3)}
 
 
 class Pentago:
-    """Pentago is a two-player abstract strategy game played on a 6×6 board,
-    which is divided into four 3×3 sub-boards (or quadrants). Players take turns
-    placing a marble of their color (either black or white) onto an unoccupied
-    space on the board and then rotating one of the sub-boards by 90 degrees,
-    either clockwise or anti-clockwise. The rotation step is mandatory, and the
-    player can choose to rotate any of the four sub-boards, not necessarily the
-    one where they placed the marble.
-
-    A player wins by getting five of their marbles in a vertical, horizontal,
-    or diagonal row, either before or after the sub-board rotation. If a
-    player achieves five-in-a-row before the rotation step, the game ends
-    immediately, and the player doesn't need to rotate a sub-board. If both
-    players achieve five-in-a-row after the rotation, the game is a draw. If
-    only the opponent gets a five-in-a-row after the rotation, the opponent
-    wins. If all 36 spaces on the entire board are occupied without forming a
-    row of five after the rotation, the game ends in a draw.
-
+    """
     * Handles all the logic for the game. Initializes and keeps track of the
     board and the game state, including if a player has won, how many pieces
     have been placed, and whose turn it is.
@@ -55,7 +39,6 @@ class Pentago:
     to reflect the placed piece and sub_board rotation, and re-evaluating the
     game state. Also handles some input validation.
     * Can display a visual representation of the board.
-    * Has various helper methods to accomplish the above.
     """
 
     def __init__(self):
@@ -245,7 +228,7 @@ class Pentago:
         if not (0 <= x <= 5 and 0 <= y <= 5):
             return []
 
-        # rightward (e.g. (0,0) to (5,5))
+        # down-right (e.g. (0,0) to (5,5))
         dist_from_starting_edge = min(y, x)
         y -= dist_from_starting_edge
         x -= dist_from_starting_edge
@@ -255,7 +238,7 @@ class Pentago:
             y += 1
             x += 1
 
-        # leftward (e.g. (0,5) to (5,0))
+        # down-left (e.g. (0,5) to (5,0))
         y, x = position
         dist_from_starting_edge = min(y, 5 - x)
         y -= dist_from_starting_edge
